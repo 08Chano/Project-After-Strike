@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1861355810177974}
+  m_IsPrefabParent: 1
+--- !u!1 &1861355810177974
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4881399833422280}
+  - component: {fileID: 20892099604909448}
+  - component: {fileID: 92516716930821364}
+  - component: {fileID: 124283942873344202}
+  - component: {fileID: 81629675971834758}
+  - component: {fileID: 114270075705160296}
+  m_Layer: 0
+  m_Name: Main Camera
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4881399833422280
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1861355810177974}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &20892099604909448
+Camera:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1861355810177974}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 1
+  orthographic size: 5
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+  m_StereoMirrorMode: 0
+--- !u!81 &81629675971834758
+AudioListener:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1861355810177974}
+  m_Enabled: 1
+--- !u!92 &92516716930821364
+Behaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1861355810177974}
+  m_Enabled: 1
+--- !u!114 &114270075705160296
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1861355810177974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfcecf50f0790144fb91c80287106011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TeamCount: 0
+  TeamColour: {r: 0, g: 0, b: 0, a: 0}
+  Faction: 0
+  MapDimensions: 0
+  Mod_Funds_Starting: 0
+  Mod_Funds_Generated: 1000
+  Mod_Funds_Loss: 0
+  Mod_Funds_isStolen: 0
+  Mod_FundsScaling_isEnabled: 0
+  Mod_FundsScaling_isLinear: 0
+  Mod_FundsScaling_Duration: 0
+  Mod_FundsScaling_Modifier: 0
+  Mod_Funds_Modifier: 0
+  Mod_Cost_Repair: 100
+  Mod_Cost_Repair_Efficency: 20
+  Mod_Cost_Supply_Weak: 20
+  Mod_Cost_Scaling_isEnabled: 0
+  Mod_Cost_Scaling_isLinear: 0
+  Mod_Cost_Scaling_Duration: 0
+  Mod_Cost_Scaling_Modifier: 0
+  Mod_Cost_ScaleCost: 0
+  Weather_FogOfWar_isEnabled: 0
+  Weather_isEnabled: 0
+  Weather_Changes_isEnabled: 0
+  Weather_IntervalRate: 0
+  Weather_Value: 0
+  Weather_isRandom: 0
+  Weather_Randomness: 0
+  Weather_Hazard_isEnabled: 0
+  Weather_Hazard_Weather_isEnabled: 0
+  Weather_Hazard_ExWeather_isEnabled: 0
+  Weather_Hazard_River_isEnabled: 0
+  Weather_Hazard_Terrain_isEnabled: 0
+  Weather_Hazard_Unnatural_isEnabled: 0
+  Gameplay_DeployedReady: 0
+  Gameplay_Unit_Fatigue_isEnabled: 0
+  Gameplay_Unit_Fatigue_Mod: 0
+  Gameplay_Unit_Morale_isEnabled: 0
+  Gameplay_Unit_Morale_Mod: 0
+  Gameplay_Unit_Ranks_isEnabled: 0
+  Gameplay_Unit_Ranks_Cap: 0
+  Gameplay_Unit_Inflictions_isEnabled: 0
+  Gameplay_Unit_Inflictions_Severity: 0
+  Gameplay_Unit_Inflictions_PositiveRate: 0
+  Gameplay_Unit_Inflictions_NegativeRate: 0
+  Gameplay_Unit_Sync_isEnabled: 0
+  Gameplay_Unit_Sync_Intensity: 0
+  Gameplay_Unit_Commanders_isEnabled: 0
+  Gameplay_Unit_CommanderPower_isEnabled: 0
+  Gameplay_Unit_CommanderPower_PassiveCharge: 0
+  Gameplay_Unit_CommanderPower_ActionCharge: 0
+  Gameplay_Unit_CommanderPower_OverCharge_isEnabled: 0
+  HeldObject: {fileID: 0}
+--- !u!124 &124283942873344202
+Behaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1861355810177974}
+  m_Enabled: 1
