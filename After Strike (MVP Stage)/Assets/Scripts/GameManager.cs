@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using AfterStrike.Manager;
+using AfterStrike.UI;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -97,7 +99,7 @@ public class GameManager : GameSystems
                                 if (HeldObject != null) {
                                     GameManager.GManager.HeldObject.GetComponent<UnitActions>().WipeSelect();
                                 }
-                                if (!UIManager.ActionsActive) {
+                                if (!GameScreenManager.ActionsActive) {
                                     ActToggle();
                                 }
                                 HeldObject = hit.collider.gameObject;
@@ -160,7 +162,9 @@ public class GameManager : GameSystems
                 GameManager.GManager.HeldObject.GetComponent<UnitActions>().WipeSelect();
             }
         }
-        if (UIManager.ActionsActive) { ActToggle(); }
+ 
+        if (GameScreenManager.ActionsActive) { ActToggle(); }
+
         GameManager.GManager.HeldObject = null;
 
         GameManager.GManager.QuickCancel();

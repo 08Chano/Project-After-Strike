@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using AfterStrike.Manager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -200,7 +201,7 @@ public class LevelManager : MonoBehaviour {
         FactionQueue.Enqueue(faction);
         LevelManager.DM.turntimer++;
         if (LevelManager.DM.turntimer++ > GameManager.GManager.TeamCount) {
-            UIManager.Profiler.PhaseValue++;
+            GameScreenManager.Profiler.PhaseValue++;
             LevelManager.DM.turntimer = 0;
         }
         BeginTurn();

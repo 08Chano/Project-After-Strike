@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using AfterStrike.Manager;
+using AfterStrike.UI;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -109,7 +111,7 @@ public class Faction : MonoBehaviour
 
     public void StartTurn_Faction()
     {
-        UIManager.UpdateProfiles(this.GetComponent<Faction>());
+        GameScreenManager.UpdateProfiles(this.GetComponent<Faction>());
         Funds += TerrainList.Count * GameManager.GManager.Mod_Funds_Generated;
 
         print(Faction_Name + " is Starting their turn. Their funds are at: " + Funds + "and have " + TerrainList.Count + " tiles under their control, producing: " + GameManager.GManager.Mod_Funds_Generated);

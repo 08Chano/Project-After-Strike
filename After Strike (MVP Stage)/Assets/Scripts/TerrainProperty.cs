@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TerrainProperty : TerrainID
 {
+    public Image TerrainImage;
 
     public List<TerrainProperty> MovementTileLinks = new List<TerrainProperty>();//Adjacent tiles that the unit is able to navigate to
     public List<TerrainProperty> AttackRangeList= new List<TerrainProperty>();//Creates an AoE field that the unit is able to attack to, doesn't care if target is available

@@ -54,7 +54,9 @@ public class TerrainID : MonoBehaviour
         HasRepairs = true;
         HasSuppliesStrong = true;
     }
-    public void TerrainType(int Identity) {
+
+    public void TerrainType(int Identity)
+    {
 
         TileMat_Attack = GameManager.GManager.Gameplay_Colour_Tile_Attack;
         TileMat_Move = GameManager.GManager.Gameplay_Colour_Tile_Movment;
@@ -73,7 +75,7 @@ public class TerrainID : MonoBehaviour
                 TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1, "Woods");//Woods
                 break;
             case 3:
-                TravelCost(2, 1, 1, 1, 2, 999, 999, 1, 1,"River");//River
+                TravelCost(2, 1, 1, 1, 2, 999, 999, 1, 1, "River");//River
                 break;
             case 4:
                 TravelCost(2, 2, 999, 1, 999, 999, 999, 1, 1, "Broken Earth");//Broken Earth
@@ -82,7 +84,7 @@ public class TerrainID : MonoBehaviour
                 TravelCost(2, 2, 3, 2, 999, 999, 999, 1, 1, "Mountain H1");//Mountain H1
                 break;
             case 6:
-                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999,"Mountain H2");//Mountain H2
+                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999, "Mountain H2");//Mountain H2
                 break;
             case 7:
                 TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1, "Crags");//Crags
@@ -223,7 +225,9 @@ public class TerrainID : MonoBehaviour
         }
         return 0;
     }
-    public void CaptureCall(Faction faction) {
+
+    public void CaptureCall(Faction faction)
+    {
         CapturePower = 0;
         gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = faction.inGameID_Col;
         faction.CapturedTilesAdd(this.GetComponent<TerrainProperty>());

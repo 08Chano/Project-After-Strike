@@ -38,6 +38,7 @@ public class UnitProperties : MonoBehaviour
     /// <summary>
     /// Generates an array of all of the available tiles that the unit can move to.
     /// </summary>
+
     protected void CastArea()
     {
         Coordinates = GameObject.FindGameObjectsWithTag("Land");
