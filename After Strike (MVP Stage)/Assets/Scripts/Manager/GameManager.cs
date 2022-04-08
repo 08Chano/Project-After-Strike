@@ -1,7 +1,4 @@
 ﻿using AfterStrike.Manager;
-using AfterStrike.UI;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

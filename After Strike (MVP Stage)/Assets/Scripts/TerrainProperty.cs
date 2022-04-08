@@ -1,18 +1,52 @@
-﻿using System.Collections;
+﻿using AfterStrike.Enum;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class TerrainProperty : TerrainID
+public class TerrainProperty : MonoBehaviour
 {
-    public Image TerrainImage;
+    public int DefenceValue { get => m_DefenceValue; private set => m_DefenceValue = value; }
+    public bool IsCapturable { get => m_IsCapturable; private set => m_IsCapturable = value; }
+    public bool IsDefendable { get => m_IsDefendable; private set => m_IsDefendable = value; }
+    public bool IsBase { get => m_IsBase; private set => m_IsBase = value; }
+    public FactionType Heldby { get => m_Heldby; private set => m_Heldby = value; }
+    public bool IsOccupied => m_IsOccupied != FactionType.Neutral || m_IsOccupied == Heldby;
+    public RecoveryType RecoveryStrength { get => m_RecoveryStrength; private set => m_RecoveryStrength = value; }
+    public int CapturePower 
+    { 
+        get => m_CapturePower;
+        set {
+            m_CapturePower = value;
+            CapturePowerUpdated?.Invoke(CapturePower);
+        }
+    }
 
-    public List<TerrainProperty> MovementTileLinks = new List<TerrainProperty>();//Adjacent tiles that the unit is able to navigate to
-    public List<TerrainProperty> AttackRangeList= new List<TerrainProperty>();//Creates an AoE field that the unit is able to attack to, doesn't care if target is available
+    public Action<int> CapturePowerUpdated { get => m_CapturePowerUpdated; set => m_CapturePowerUpdated = value; }
+
+
+    [Header("TIle Effects")]
+    [SerializeField] private SpriteRenderer m_MainSpriteRenderer;
+    [SerializeField] private Material m_AttackTileMat;
+    [SerializeField] private Material m_MoveTileMat;
+    [SerializeField] private Material m_TargetTileMat;
+
+    /// <summary>
+    /// Adjacent tiles that the unit is able to navigate to.
+    /// </summary>
+    public List<TerrainProperty> MovementTileLinks = new List<TerrainProperty>();
+
+    /// <summary>
+    /// Creates an AoE field that the unit is able to attack to, doesn't care if target is available.
+    /// </summary>
+    public List<TerrainProperty> AttackRangeList = new List<TerrainProperty>();
 
     public TerrainProperty parent = null;
 
-    public int TerrainID;
+    public SpriteRenderer MainSpriteRenderer => m_MainSpriteRenderer;
+
+
+    private Action<int> m_CapturePowerUpdated;
+
 
     public bool Occuping;
     public bool isHostile;
@@ -21,59 +55,196 @@ public class TerrainProperty : TerrainID
     public bool isValid;
     public bool isAccounted = false;
 
+    [Header("Unit Effects")]
+    private int m_DefenceValue = 0;
+    private bool m_IsCapturable = false;
+    private bool m_IsDefendable = false;
+
+    [Header("Terrain Attributes")]
+    private string m_TileName = string.Empty;
+    private bool m_IsBase = false;
+    private bool m_IsCaptured = false;
+    private bool m_IsDefended = false;
+    private FactionType m_IsOccupied = FactionType.Neutral;
+    private FactionType m_Heldby = FactionType.Neutral;
+    private RecoveryType m_RecoveryStrength = RecoveryType.None;
+
+    [Range(0, 200)]
+    private int m_CapturePower = 0;
+
+    [Header("Unit Movement Cost")]
+    private Dictionary<MovementType, int> m_MovementCostDict = new Dictionary<MovementType, int>();
+
+    public void SetBase(bool isSeabase)
+    {
+        //Sets tile as faction's base, overriding terrain values
+        if (isSeabase)
+        {
+            TravelCost(1, 1, 1, 1, 1, 1, 1, 1, 1, "Sea HQ");
+        }
+        else
+        {
+            TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "HQ");
+        }
+
+        IsBase = true;
+        IsCapturable = true;
+        IsDefendable = true;
+        RecoveryStrength = RecoveryType.Strong;
+    }
+
+    public void SetTerrainProperties(TerrainType terrainType)
+    {
+        switch (terrainType)
+        {
+            case TerrainType.Plains:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Plains");
+                break;
+            case TerrainType.Marsh:
+                TravelCost(2, 1, 2, 1, 999, 999, 999, 1, 1, "Marsh");//Marsh
+                break;
+            case TerrainType.Woods:
+                TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1, "Woods");//Woods
+                break;
+            case TerrainType.River:
+                TravelCost(2, 1, 1, 1, 2, 999, 999, 1, 1, "River");//River
+                break;
+            case TerrainType.BrokenEarth:
+                TravelCost(2, 2, 999, 1, 999, 999, 999, 1, 1, "Broken Earth");//Broken Earth
+                break;
+            case TerrainType.Hills:
+                TravelCost(2, 2, 3, 2, 999, 999, 999, 1, 1, "Mountain H1");//Mountain H1
+                break;
+            case TerrainType.Mountain:
+                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999, "Mountain H2");//Mountain H2
+                break;
+            case TerrainType.Crags:
+                TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1, "Crags");//Crags
+                break;
+            case TerrainType.Dunes:
+                TravelCost(1, 1, 2, 1, 999, 999, 999, 1, 1, "Dunes");//Dunes
+                break;
+            case TerrainType.City:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "City");//City
+                IsCapturable = true;
+                break;
+            case TerrainType.Town:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Town");//Town
+                break;
+            case TerrainType.Factory:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Facotry");//Factory
+                break;
+            case TerrainType.Airport:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Airport");//Airport
+                break;
+            case TerrainType.Harbour:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Dock");//Dock
+                break;
+            case TerrainType.Rubble:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Rubble");//Rubble
+                break;
+            case TerrainType.Road:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Road");//Road
+                break;
+            case TerrainType.Bridge:
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Bridge");//Bridge
+                break;
+            case TerrainType.Sea:
+                TravelCost(999, 999, 999, 999, 1, 1, 1, 1, 1, "Sea");//Sea
+                break;
+            case TerrainType.RoughSea:
+                TravelCost(999, 999, 999, 999, 2, 1, 1, 1, 1, "Rough Sea");//Rough Sea
+                break;
+            case TerrainType.Fog:
+                TravelCost(999, 999, 999, 999, 1, 1, 1, 1, 1, "Fog");//Fog
+                break;
+            case TerrainType.Reef:
+                TravelCost(999, 999, 999, 999, 2, 3, 3, 1, 1, "Reef");//Reef
+                break;
+            default:
+                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999, "Void");
+                break;
+        }
+    }
+
+    private void TravelCost(int foot, int specialist, int tiresA, int tiresB, int tank, int shipA, int shipB, int air, int sub, string NewName)
+    {
+        m_MovementCostDict.Clear();
+
+        m_MovementCostDict = new Dictionary<MovementType, int>();
+
+        m_MovementCostDict.Add(MovementType.Foot, foot);
+        m_MovementCostDict.Add(MovementType.Specialist, specialist);
+        m_MovementCostDict.Add(MovementType.TiresOne, tiresA);
+        m_MovementCostDict.Add(MovementType.TiresTwo, tiresB);
+        m_MovementCostDict.Add(MovementType.Tank, tank);
+
+        m_MovementCostDict.Add(MovementType.SmallShip, shipA);
+        m_MovementCostDict.Add(MovementType.LargeShip, shipB);
+        m_MovementCostDict.Add(MovementType.Submarine, sub);
+
+        m_MovementCostDict.Add(MovementType.Air, air);
+
+        m_TileName = NewName;
+    }
+
+    public int TCost(MovementType unitType)
+    {
+        return m_MovementCostDict[unitType];
+    }
+
+    public void CaptureCall(Faction faction)
+    {
+        CapturePower = 0;
+        gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = faction.inGameID_Col;
+        faction.CapturedTilesAdd(this.GetComponent<TerrainProperty>());
+    }
+
     public int distance = 0;
     public int Range = 0;
 
-    void OnEnable()
+    private void OnEnable()
     {
         GameManager.CancelToggle += Reset;
     }
-    void OnDisable()
+
+    private void OnDisable()
     {
         GameManager.CancelToggle -= Reset;
     }
 
     private void Update()
     {
-        //        Debug.DrawRay(gameObject.transform.position, Vector3.forward, Color.red, 1);
+        //debug.drawray(gameobject.transform.position, vector3.forward, color.red, 1);
         if (isValid)
         {
-            gameObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+            m_MainSpriteRenderer.gameObject.SetActive(true);
+
             if (isHostile)
             {
-                gameObject.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().material = TileMat_Attack;
-                //gameObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-                //gameObject.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
-                //gameObject.transform.GetChild(0).GetChild(2).gameObject.SetActive(true);
+                m_MainSpriteRenderer.material = m_AttackTileMat;
             }
             else if (!isOccupied && !Occuping)
             {
                 if (isTarget)
                 {
-                    gameObject.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().material = TileMat_Target;
-                    //gameObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
-                    //gameObject.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
-                    //gameObject.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);
+                    m_MainSpriteRenderer.material = m_TargetTileMat;
                 }
                 else
                 {
-                    gameObject.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().material = TileMat_Move;
-                    //gameObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-                    //gameObject.transform.GetChild(0).GetChild(1).gameObject.SetActive(true);
-                    //gameObject.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);
+                    m_MainSpriteRenderer.material = m_MoveTileMat;
                 }
             }
-        } else {
-            gameObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-            //gameObject.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-            //gameObject.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
-            //gameObject.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);
+        }
+        else
+        {
+            m_MainSpriteRenderer.gameObject.SetActive(false);
         }
     }
 
-
     //Movement
-    public void ViableMovementGrid(GameObject Searcher) {
+    public void ViableMovementGrid(GameObject Searcher)
+    {
         Reset();
 
         MovementConnections(Vector3.forward, Searcher);
@@ -82,23 +253,37 @@ public class TerrainProperty : TerrainID
         MovementConnections(Vector3.left, Searcher);
 
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.up, out hit, 1)) {
-            if (hit.collider.tag == Searcher.tag) {
+
+        if (Physics.Raycast(transform.position, Vector3.up, out hit, 1))
+        {
+            if (hit.collider.tag == Searcher.tag)
+            {
                 Occuping = true;
             }
         }
     }
-    public void MovementConnections(Vector3 Axis, GameObject Searcher) {
+
+    private void MovementConnections(Vector3 Axis, GameObject Searcher)
+    {
         Vector3 halfExtents = new Vector3(0.25f, 0.25f, 0.25f);
         Collider[] colliders = Physics.OverlapBox(transform.position + Axis, halfExtents);
-        foreach (Collider item in colliders) {
+
+        foreach (Collider item in colliders)
+        {
             TerrainProperty terrain = item.GetComponent<TerrainProperty>();
-            if (terrain != null && !terrain.isOccupied) {
+
+            if (terrain != null && !terrain.isOccupied)
+            {
                 RaycastHit hit;
-                if (!Physics.Raycast(terrain.transform.position, Vector3.up, out hit, 1)) {
+
+                if (!Physics.Raycast(terrain.transform.position, Vector3.up, out hit, 1))
+                {
                     MovementTileLinks.Add(terrain);
-                } else {
-                    if (hit.collider.tag == Searcher.tag) {
+                }
+                else
+                {
+                    if (hit.collider.tag == Searcher.tag)
+                    {
                         MovementTileLinks.Add(terrain);
                     }
                 }
@@ -106,28 +291,38 @@ public class TerrainProperty : TerrainID
         }
     }
 
-    //Line of Sight based Attacks
-    public void LoSAttackGrid(GameObject Searcher, Vector3 Direction, int Distance) {
+    /// <summary>
+    /// Line of Sight based Attacks
+    /// </summary>
+    /// <param name="Searcher"></param>
+    /// <param name="Direction"></param>
+    /// <param name="Distance"></param>
+    public void LoSAttackGrid(GameObject Searcher, Vector3 Direction, int Distance)
+    {
         Vector3 halfExtents = new Vector3(0.25f, 0.25f, 0.25f);
         Collider[] colliders = Physics.OverlapBox(transform.position + Direction, halfExtents);
         isValid = true;
         isHostile = true;
         Range = Distance;
 
-        foreach (Collider item in colliders) {
+        foreach (Collider item in colliders)
+        {
             TerrainProperty terrain = item.GetComponent<TerrainProperty>();
-            if (terrain != null) {
+            if (terrain != null)
+            {
                 AttackRangeList.Add(terrain);
                 terrain.parent = gameObject.GetComponent<TerrainProperty>();
-                if (Range > 1) {
-                    terrain.LoSAttackGrid(Searcher, Direction, Range-1);
+                if (Range > 1)
+                {
+                    terrain.LoSAttackGrid(Searcher, Direction, Range - 1);
                 }
             }
         }
     }
 
     //Area of attack
-    public void ViableTargetGrid(GameObject Searcher) {
+    public void ViableTargetGrid(GameObject Searcher)
+    {
         Reset();
 
         TargetGridHighlighter(Vector3.forward, Searcher);
@@ -135,25 +330,28 @@ public class TerrainProperty : TerrainID
         TargetGridHighlighter(Vector3.right, Searcher);
         TargetGridHighlighter(Vector3.left, Searcher);
     }
-    public void TargetGridHighlighter(Vector3 Axis, GameObject Searcher) {
+    public void TargetGridHighlighter(Vector3 Axis, GameObject Searcher)
+    {
         Vector3 halfExtents = new Vector3(0.25f, 0.25f, 0.25f);
         Collider[] colliders = Physics.OverlapBox(transform.position + Axis, halfExtents);
 
-        foreach (Collider item in colliders) {
+        foreach (Collider item in colliders)
+        {
             TerrainProperty terrain = item.GetComponent<TerrainProperty>();
-            if (terrain != null) {
+            if (terrain != null)
+            {
                 AttackRangeList.Add(terrain);
                 isHostile = true;
             }
         }
     }
 
-    public void Reset() {
+    public void Reset()
+    {
         AttackRangeList.Clear();
         MovementTileLinks.Clear();
         Occuping = false;
         isHostile = false;
-        isOccupied = false;
         isTarget = false;
         isValid = false;
         isAccounted = false;

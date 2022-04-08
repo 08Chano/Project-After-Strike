@@ -1,0 +1,29 @@
+﻿namespace AfterStrike.Enum
+{
+    public enum TerrainType
+    {
+        Void,
+        Plains,
+        Marsh,
+        Woods,
+        River,
+        BrokenEarth,
+        Hills,
+        Mountain,
+        Crags,
+        Dunes,
+        City,
+        Town,
+        Factory,
+        Airport,
+        Harbour,
+        Rubble,
+        Road,
+        Bridge,
+        Tunnel,
+        Sea,
+        RoughSea,
+        Fog,
+        Reef,
+    }
+}

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using AfterStrike.Class.Unit;
+using AfterStrike.Enum;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class UnitProperties : MonoBehaviour
     Stack<TerrainProperty> CP = new Stack<TerrainProperty>();
 
     private GameObject SkipperVar;  //Reset each time it carried out
-
+    private FactionType m_FactionAllegiance;
     public bool isSelected;
     public bool ActionAvailable = true;
     public bool ActionsMove = true;
@@ -91,7 +92,7 @@ public class UnitProperties : MonoBehaviour
                     {
                         item.parent = terrain;
                         item.isAccounted = true;
-                        item.distance = item.TCost(gameObject.GetComponent<UnitAttributes>().UnitType) + terrain.distance;
+                        item.distance = item.TCost(gameObject.GetComponent<UnitAttributes>().MoveType) + terrain.distance;
                         if (item.distance <= gameObject.GetComponent<UnitAttributes>().FuelPool)
                         {
                             queue.Enqueue(item);
@@ -340,15 +341,13 @@ public class UnitProperties : MonoBehaviour
             if (hit.collider.GetComponent<TerrainProperty>() != null)
             {
                 TerrainProperty terrain = hit.collider.GetComponent<TerrainProperty>();
-                if (terrain.isCapturable)
+                if (terrain.IsCapturable)
                 {
-                    if (!terrain.isCaptured || terrain.Heldby != gameObject.tag)
+                    if (terrain.Heldby != m_FactionAllegiance)
                     {
                         terrain.CapturePower += this.GetComponent<UnitAttributes>().HealthPool;
                         if (terrain.CapturePower >= 200)
                         {
-                            terrain.isCaptured = true;
-                            terrain.Heldby = this.tag;
                             terrain.CaptureCall(gameObject.GetComponent<UnitAttributes>().FactionSided.GetComponent<Faction>());
                         }
                     }
@@ -362,55 +361,23 @@ public class UnitProperties : MonoBehaviour
         gameObject.GetComponent<UnitAttributes>().isWaiting = true;
         EndPhase();
     }
-    public void Action_Recover(int RecID, int MaxFuelPool) {
+    public void Action_Recover(RecoveryType RecID, int MaxFuelPool) {
         switch (RecID)
         {
-            case 1:
+            case RecoveryType.Weak:
                 //Health
-                if (GetComponent<UnitAttributes>().HealthPool < 100)
-                {
-                    if (LevelManager.FactionQueue.Peek().Funds >= GameManager.GManager.Mod_Cost_Repair)
-                    {
-                        LevelManager.FactionQueue.Peek().Funds -= GameManager.GManager.Mod_Cost_Repair;
-                        HealthRestore(GameManager.GManager.Mod_Cost_Repair_Efficency);
-                    }
-                }
-                break;
-
-            case 2:
-                //Low Supplies
-                FuelLoad(GameManager.GManager.Mod_Cost_Supply_Weak, MaxFuelPool);
-                break;
-
-            case 3:
-                //Health and Low Supply
-                if (GetComponent<UnitAttributes>().HealthPool < 100)
-                {
-                    if (LevelManager.FactionQueue.Peek().Funds >= GameManager.GManager.Mod_Cost_Repair)
-                    {
-                        LevelManager.FactionQueue.Peek().Funds -= GameManager.GManager.Mod_Cost_Repair;
-                        HealthRestore(GameManager.GManager.Mod_Cost_Repair_Efficency);
-                    }
-                }
-                FuelLoad(GameManager.GManager.Mod_Cost_Repair_Efficency, MaxFuelPool);
-                break;
-
-            case 4:
-                //Health and Full Supply
-                if (GetComponent<UnitAttributes>().HealthPool < 100)
-                {
-                    if (LevelManager.FactionQueue.Peek().Funds >= GameManager.GManager.Mod_Cost_Repair)
-                    {
-                        LevelManager.FactionQueue.Peek().Funds -= GameManager.GManager.Mod_Cost_Repair;
-                        HealthRestore(GameManager.GManager.Mod_Cost_Repair_Efficency);
-                    }
-                }
                 FuelLoad(MaxFuelPool, MaxFuelPool);
-
                 break;
 
-            case 5:
-                //Full Supply
+            case RecoveryType.Strong:
+                if (GetComponent<UnitAttributes>().HealthPool < 100)
+                {
+                    if (LevelManager.FactionQueue.Peek().Funds >= GameManager.GManager.Mod_Cost_Repair)
+                    {
+                        LevelManager.FactionQueue.Peek().Funds -= GameManager.GManager.Mod_Cost_Repair;
+                        HealthRestore(GameManager.GManager.Mod_Cost_Repair_Efficency);
+                    }
+                }
                 FuelLoad(MaxFuelPool, MaxFuelPool);
                 break;
 
@@ -422,6 +389,7 @@ public class UnitProperties : MonoBehaviour
     private void FuelLoad(int Restoration, int MaxFuelPool)
     {
         gameObject.GetComponent<UnitAttributes>().FuelPool += Restoration;
+
         if (gameObject.GetComponent<UnitAttributes>().FuelPool > MaxFuelPool)
         {
             gameObject.GetComponent<UnitAttributes>().FuelPool = MaxFuelPool;
@@ -430,6 +398,7 @@ public class UnitProperties : MonoBehaviour
     private void HealthRestore(int Restoration)
     {
         gameObject.GetComponent<UnitAttributes>().HealthPool += Restoration;
+
         if (gameObject.GetComponent<UnitAttributes>().HealthPool > 100)
         {
             gameObject.GetComponent<UnitAttributes>().HealthPool = 100;

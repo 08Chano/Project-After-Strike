@@ -1,0 +1,35 @@
+namespace AfterStrike.Enum
+{
+    public enum UnitType
+    {
+        Entity,
+        Infantry,
+        Specialist,
+        Scout,
+        IFV,
+        APC,
+        LightTank,
+        MediumTank,
+        HeavyTank,
+        WalkerTank,
+        AntiAir,
+        AntiTank,
+        MobileArtiller,
+        RocketArtillery,
+        HeavyArtillery,
+        LightFighter,
+        JetFighter,
+        SurfaceFighter,
+        GunShip,
+        Bomber,
+        StealthBomber,
+        Helicopter,
+        Transporter,
+        Lander,
+        Cruiser,
+        Destroyer,
+        Carrier,
+        Battleship,
+        Submarine,
+    }
+}

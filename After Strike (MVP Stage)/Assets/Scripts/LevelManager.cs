@@ -1,5 +1,5 @@
-﻿using AfterStrike.Manager;
-using System.Collections;
+﻿using AfterStrike.Enum;
+using AfterStrike.Manager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,17 +7,15 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour {
 
     public static Queue<Faction> FactionQueue = new Queue<Faction>();
-
     public static LevelManager DM;
 
     private void OnEnable()
     {
-//        Debug.Log("something's enabled");
         SceneManager.sceneLoaded += StartGame;
     }
+
     private void OnDisable()
     {
-//        Debug.Log("something's disabled");
         SceneManager.sceneLoaded -= StartGame;
     }
 
@@ -39,15 +37,15 @@ public class LevelManager : MonoBehaviour {
         Debug.Log("Game has started");
     }
 
+    [SerializeField]
+    private TerrainProperty m_BaseTerrain;
     private GameObject[] Team;
-    public GameObject[,] Map;
+    public TerrainProperty[,] Map;
     private int turntimer;
 
     /// <summary>
     /// Controller for the game's main system
     /// </summary>
-
-
     public void StartGame(Scene scene, LoadSceneMode loadScene) {
         //Test
         //print("Something's supposed to happen in here: " + scene.name);
@@ -64,68 +62,63 @@ public class LevelManager : MonoBehaviour {
         //Actual Function
         if (scene.name.Contains("Main")) {
 //            print("This looks right");
-            Map = new GameObject[bounds, bounds];
+            Map = new TerrainProperty[bounds, bounds];
 
             for (int i = 0; i < bounds; i++) {
                 for (int j = 0; j < bounds; j++) {
-                    Map[i, j] = Instantiate(Resources.Load("Tile", typeof(GameObject)), new Vector3(i, 0, j), Quaternion.identity, gameObject.transform) as GameObject;
+                    Map[i, j] = Instantiate(m_BaseTerrain, new Vector3(i, 0, j), Quaternion.identity, gameObject.transform);
                     if (i == 0 || j == 0 || i == bounds -1 || j == bounds - 1) {
-                        Map[i, j].GetComponent<TerrainProperty>().TerrainType(20);
+                        Map[i, j].SetTerrainProperties(TerrainType.Sea);
                     } else {
-                        Map[i, j].GetComponent<TerrainProperty>().TerrainType(0);
+                        Map[i, j].SetTerrainProperties(TerrainType.Plains);
                     }
                 }
             }
 
             //Test
-//            print("Let's get to work! Total Teams are: " + GameManager.GManager.TeamCount);
             int spacer = 1;
             GameObject temp;
 
             switch (GameManager.GManager.TeamCount)
             {
                 case 2:
-//                    print("Two Teams!");
-
-                    Map[spacer, spacer].GetComponent<TerrainProperty>().TerrainType(9);
+                    Map[spacer, spacer].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, spacer), Quaternion.identity) as GameObject;
                     temp.tag = "Faction1";
 
-                    Map[bounds - (spacer + 1), bounds - (spacer + 1)].GetComponent<TerrainProperty>().TerrainType(9);
+                    Map[bounds - (spacer + 1), bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
                     temp.tag = "Faction2";
                     break;
-                case 3:
-//                    print("Three Teams!");
 
-                    Map[spacer, spacer].GetComponent<TerrainProperty>().TerrainType(9);
+                case 3:
+                    Map[spacer, spacer].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, spacer), Quaternion.identity) as GameObject;
                     temp.tag = "Faction1";
 
-                    Map[spacer, bounds - (spacer + 1)].GetComponent<TerrainProperty>().TerrainType(9);
+                    Map[spacer, bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
                     temp.tag = "Faction2";
 
-                    Map[bounds - (spacer + 1), spacer].GetComponent<TerrainProperty>().TerrainType(9);
+                    Map[bounds - (spacer + 1), spacer].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, spacer), Quaternion.identity) as GameObject;
                     temp.tag = "Faction3";
                     break;
-                case 4:
-//                    print("Four Teams!");
 
-                    Map[spacer, spacer].GetComponent<TerrainProperty>().TerrainType(9);
+                case 4:
+                    Map[spacer, spacer].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, spacer), Quaternion.identity) as GameObject;
                     temp.tag = "Faction1";
 
-                    Map[spacer, bounds - (spacer + 1)].GetComponent<TerrainProperty>().TerrainType(9);
+                    Map[spacer, bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
                     temp.tag = "Faction2";
 
-                    Map[bounds - (spacer + 1), spacer].GetComponent<TerrainProperty>().TerrainType(9);
+                    Map[bounds - (spacer + 1), spacer].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, spacer), Quaternion.identity) as GameObject;
                     temp.tag = "Faction3";
 
-                    Map[bounds - (spacer + 1), bounds - (spacer + 1)].GetComponent<TerrainProperty>().TerrainType(9);
+                    Map[bounds - (spacer + 1), bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
                     temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
                     temp.tag = "Faction4";
                     break;
@@ -140,9 +133,9 @@ public class LevelManager : MonoBehaviour {
                 nfaction.tag = "Faction" + (i + 1);
                 nfaction.inGameID_ID = nfaction.tag;
                 if (i == 0) {
-                    nfaction.FactionGenerator(Random.Range(0, 6), GameManager.GManager.TeamColour);
+                    nfaction.FactionGenerator((FactionType)Random.Range(1, 7), GameManager.GManager.TeamColour);
                 } else {
-                    nfaction.FactionGenerator(Random.Range(0, 6), Color.white);
+                    nfaction.FactionGenerator((FactionType)Random.Range(1, 7), Color.white);
                 }
                 FactionQueue.Enqueue(newfaction.GetComponent<Faction>());
             }
@@ -152,14 +145,6 @@ public class LevelManager : MonoBehaviour {
             //Reset's Camera Position
             GameManager.GManager.transform.position = new Vector3(0, 10, 0);
             GameManager.GManager.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
-            print("Colours pulled");
-            GameManager.GManager.Gameplay_Colour_Tile_Movment = Resources.Load("Colours/Colour_Tile_Movment", typeof(Material)) as Material;
-            print(GameManager.GManager.Gameplay_Colour_Tile_Movment);
-            GameManager.GManager.Gameplay_Colour_Tile_Attack = Resources.Load("Colours/Colour_Tile_Attack", typeof(Material)) as Material;
-            print(GameManager.GManager.Gameplay_Colour_Tile_Attack);
-            GameManager.GManager.Gameplay_Colour_Tile_Target = Resources.Load("Colours/Colour_Tile_Target", typeof(Material)) as Material;
-            print(GameManager.GManager.Gameplay_Colour_Tile_Target);
-
 
             //Starts the game's turn management
             QuickCycle();

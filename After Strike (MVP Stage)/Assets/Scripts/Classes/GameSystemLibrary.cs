@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameSystemsLibrary : MonoBehaviour
 {
@@ -21,7 +19,7 @@ public class GameSystemsLibrary : MonoBehaviour
     // Funds
     [Header("Funds")]
     public int Mod_Funds_Starting;                          //How much funds the player starts with
-    public int Mod_Funds_Generated = 1000;                         //How much funds is generated per captured tile
+    public int Mod_Funds_Generated = 1000;                  //How much funds is generated per captured tile
     public int Mod_Funds_Loss;                              //How much funds is lost after each captured tile is lost
     public bool Mod_Funds_isStolen;                         //Is funds stolen when an enemy tile is captured
     public bool Mod_FundsScaling_isEnabled;                 //Does the funds gained per turn change based on factors
@@ -104,9 +102,4 @@ public class GameSystemsLibrary : MonoBehaviour
     public int Gameplay_Unit_CommanderPower_PassiveCharge;
     public int Gameplay_Unit_CommanderPower_ActionCharge;
     public bool Gameplay_Unit_CommanderPower_OverCharge_isEnabled;
-
-    [Header("Visuals")]
-    public Material Gameplay_Colour_Tile_Movment;
-    public Material Gameplay_Colour_Tile_Attack;
-    public Material Gameplay_Colour_Tile_Target;
 }

@@ -1,3 +1,5 @@
+using AfterStrike.Class.Unit;
+using AfterStrike.Enum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,46 +36,44 @@ namespace AfterStrike.UI
 
         public void UpdateTerrainPreviewWindow(TerrainProperty terrain)
         {
-            m_TerrainProfileImage = terrain.TerrainImage;
+            m_TerrainProfileImage.sprite = terrain.MainSpriteRenderer.sprite;
             m_TerrainProfileName.text = terrain.name;
 
-            //if (terrain.isCapturable)
-            //{
-            //    if (terrain.CapturePower > 0)
-            //    {
-            //        // Fix Here
-            //        RaycastHit UnitDetection;
-            //        int UnitMask = 1 << 8;
-            //        if (Physics.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector3.down, out UnitDetection, 10, UnitMask))
-            //        {
-            //            if (UnitDetection.collider.tag.Contains("Faction") && UnitDetection.collider.GetComponent<UnitAttributes>() != null)
-            //            {
-            //                //Change the silder's fore-colour to capturing Unit's Faction Colour
-            //                DisplayCaptureBar(
-            //                    true,
-            //                    terrain.CapturePower,
-            //                    UnitDetection.collider.GetComponent<UnitAttributes>().FactionSided.GetComponent<Faction>().inGameID_Col);
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        /*Terrain_Viewer.transform.GetChild(0).GetComponent<Slider>().value = 200;
-            //        //Changes name to match it's been taken or not
-            //        if (terrain.isCaptured)
-            //        {
-            //            Terrain_Viewer.transform.GetChild(0).GetChild(3).GetComponent<Text>().text = terrain.Heldby + "'s " + terrain.name;
-            //            Terrain_Viewer.transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>().color = terrain.transform.GetChild(0).GetComponent<SpriteRenderer>().color;
-            //            Terrain_Viewer.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = terrain.transform.GetChild(0).GetComponent<SpriteRenderer>().color;
-            //        }
-            //        else
-            //        {
-            //            Terrain_Viewer.transform.GetChild(0).GetChild(3).GetComponent<Text>().text = "Neutral " + terrain.name;
-            //            Terrain_Viewer.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = Color.white;
-            //        }
-            //        */
-            //    }
-            //}
+            if (terrain.IsCapturable)
+            {
+                if (terrain.CapturePower > 0)
+                {
+                    // Fix Here
+                    RaycastHit UnitDetection;
+                    int UnitMask = 1 << 8;
+
+                    if (Physics.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector3.down, out UnitDetection, 10, UnitMask))
+                    {
+                        if (UnitDetection.collider.tag.Contains("Faction") && UnitDetection.collider.GetComponent<UnitAttributes>() != null)
+                        {
+                            //Change the silder's fore-colour to capturing Unit's Faction Colour
+                            DisplayCaptureBar(true, terrain.CapturePower,
+                                UnitDetection.collider.GetComponent<UnitAttributes>().FactionSided.GetComponent<Faction>().inGameID_Col);
+                        }
+                    }
+                }
+                else
+                {
+                    m_CaptureMeter.CurrentValue = 200;
+
+                    //Changes name to match it's been taken or not
+                    if (terrain.Heldby != FactionType.Neutral)
+                    {
+                        m_TerrainProfileName.text = $"{terrain.Heldby}'s {terrain.name}";
+                        m_TerrainProfileImage.color = terrain.MainSpriteRenderer.color;
+                    }
+                    else
+                    {
+                        m_TerrainProfileName.text = $"Neutral {terrain.name}";
+                        m_TerrainProfileImage.color = Color.white;
+                    }
+                }
+            }
         }
 
         public void UpdateUnitPreviewWindow(Sprite unitSprite = null)
@@ -122,9 +122,9 @@ namespace AfterStrike.UI
             m_DefenceMeter.CurrentValue = previewUnit.Defence;
         }
 
-        protected override void Sync()
+        private void Awake()
         {
-            base.Sync();
+            
         }
     }
 }

@@ -1,9 +1,8 @@
-﻿using AfterStrike.Manager;
-using AfterStrike.UI;
-using System.Collections;
+﻿using AfterStrike.Class.Unit;
+using AfterStrike.Enum;
+using AfterStrike.Manager;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Faction : MonoBehaviour
 {
@@ -16,7 +15,7 @@ public class Faction : MonoBehaviour
     public bool isFriendly;
     public Sprite sprite_Commander;
     public Sprite sprite_Faction;
-
+    public FactionType m_FactionType;
     //In game Content
     public string Faction_Name;
 
@@ -25,7 +24,7 @@ public class Faction : MonoBehaviour
     public List<TerrainProperty> TerrainList = new List<TerrainProperty>();
     public List<UnitAttributes> UnitList = new List<UnitAttributes>();
 
-    public void FactionGenerator(int FactionID, Color FactionColor)
+    public void FactionGenerator(FactionType FactionID, Color FactionColor)
     {
         //Assigns colour
         if (FactionColor == Color.white)
@@ -33,28 +32,24 @@ public class Faction : MonoBehaviour
             //Uses Defualt is none is specified
             switch (FactionID)
             {
-                case 0:
-                    //"The State":
+                case FactionType.Neutral:
+                    break;
+                case FactionType.TheState:
                     inGameID_Col = Color.blue;
                     break;
-                case 1:
-                    //"People's Kingdom":
+                case FactionType.PeoplesKingdom:
                     inGameID_Col = Color.green;
                     break;
-                case 2:
-                    //"Analytica":
+                case FactionType.Analytica:
                     inGameID_Col = Color.red;
                     break;
-                case 3:
-                    //"Old Faith":
+                case FactionType.OldFaith:
                     inGameID_Col = Color.blue;
                     break;
-                case 4:
-                    //"Thanatos' Suffering":
+                case FactionType.Occult:
                     inGameID_Col = new Color(128, 0, 128);
                     break;
-                case 5:
-                    //"CyberNetics":
+                case FactionType.CyberStream:
                     inGameID_Col = Color.cyan;
                     break;
                 default:
@@ -65,41 +60,38 @@ public class Faction : MonoBehaviour
         {
             inGameID_Col = FactionColor;
         }
+
         //Assigns the faction's name and values
         switch (FactionID)
         {
-            case 0:
-                //"The State":
+            case FactionType.Neutral:
+                break;
+            case FactionType.TheState:
                 Faction_Name = "The State";
                 sprite_Commander = Resources.Load("FactionIcons/TheState/Commander", typeof(Sprite)) as Sprite;
                 sprite_Faction = Resources.Load("FactionIcons/TheState/Faction", typeof(Sprite)) as Sprite;
                 break;
-            case 1:
-                //"People's Kingdom":
+            case FactionType.PeoplesKingdom:
                 Faction_Name = "People's Kingdom";
                 sprite_Commander = Resources.Load("FactionIcons/PeoplesKingdom/Commander", typeof(Sprite)) as Sprite;
                 sprite_Faction = Resources.Load("FactionIcons/PeoplesKingdom/Faction", typeof(Sprite)) as Sprite;
                 break;
-            case 2:
-                //"Analytica":
+            case FactionType.Analytica:
                 Faction_Name = "Analytica";
                 sprite_Commander = Resources.Load("FactionIcons/Analytica/Commander", typeof(Sprite)) as Sprite;
                 sprite_Faction = Resources.Load("FactionIcons/Analytica/Faction", typeof(Sprite)) as Sprite;
                 break;
-            case 3:
-                //"Old Faith":
+            case FactionType.OldFaith:
                 Faction_Name = "Old Faith";
                 sprite_Commander = Resources.Load("FactionIcons/OldFaith/Commander", typeof(Sprite)) as Sprite;
                 sprite_Faction = Resources.Load("FactionIcons/OldFaith/Faction", typeof(Sprite)) as Sprite;
                 break;
-            case 4:
-                //"Thanatos' Suffering":
+            case FactionType.Occult:
                 Faction_Name = "Thanatos' Suffering";
                 sprite_Commander = Resources.Load("FactionIcons/ThanatosSuffering/Commander", typeof(Sprite)) as Sprite;
                 sprite_Faction = Resources.Load("FactionIcons/ThanatosSuffering/Faction", typeof(Sprite)) as Sprite;
                 break;
-            case 5:
-                //"CyberNetics":
+            case FactionType.CyberStream:
                 Faction_Name = "CyberNetics";
                 sprite_Commander = Resources.Load("FactionIcons/CyberNetics/Commander", typeof(Sprite)) as Sprite;
                 sprite_Faction = Resources.Load("FactionIcons/CyberNetics/Faction", typeof(Sprite)) as Sprite;
@@ -116,33 +108,46 @@ public class Faction : MonoBehaviour
 
         print(Faction_Name + " is Starting their turn. Their funds are at: " + Funds + "and have " + TerrainList.Count + " tiles under their control, producing: " + GameManager.GManager.Mod_Funds_Generated);
 
-        foreach (UnitAttributes item in UnitList) {
-            if (item != null) {
-                if (item.isWaiting) {
+        foreach (UnitAttributes item in UnitList)
+        {
+            if (item != null)
+            {
+                if (item.isWaiting)
+                {
                     RaycastHit hit;
-                    if (Physics.Raycast(item.transform.position, Vector3.down * 10, out hit, 10)) {
-                        if (hit.collider.GetComponent<TerrainProperty>() != null) {
+
+                    if (Physics.Raycast(item.transform.position, Vector3.down * 10, out hit, 10))
+                    {
+                        if (hit.collider.GetComponent<TerrainProperty>() != null)
+                        {
                             TerrainProperty terrain = hit.collider.GetComponent<TerrainProperty>();
-                            if (terrain.isCaptured) {
-                                if (item.tag == terrain.Heldby) {
-                                    item.GetComponent<UnitActions>().Action_Recover(terrain.RecoverID(), item.MaxFuelPool);
-                                }
+
+                            if (terrain.Heldby == m_FactionType)
+                            {
+                                item.GetComponent<UnitActions>().Action_Recover(terrain.RecoveryStrength, item.MaxFuelPool);
                             }
                         }
                     }
-                } else if (item.isDefending) {
+                }
+                else if (item.isDefending)
+                {
                     item.FuelPool -= (item.FuelPool / 10);
                 }
                 item.GetComponent<UnitProperties>().BeginPhase();
-            } else {
+            }
+            else
+            {
                 UnitList.Remove(item);
             }
         }
     }
 
-    public void EndTurn_Faction() {
-        foreach (UnitAttributes item in UnitList) {
-            if (!item.isDefending || !item.isWaiting) {
+    public void EndTurn_Faction()
+    {
+        foreach (UnitAttributes item in UnitList)
+        {
+            if (!item.isDefending || !item.isWaiting)
+            {
                 LevelManager.DM.EndTurn();
             }
         }
@@ -155,7 +160,8 @@ public class Faction : MonoBehaviour
         findableUnits = GameObject.FindGameObjectsWithTag(this.tag);
         foreach (GameObject item in findableUnits)
         {
-            if (item.GetComponent<UnitAttributes>() != null) {
+            if (item.GetComponent<UnitAttributes>() != null)
+            {
                 if (item.tag == this.tag && item.GetComponent<UnitAttributes>().FactionSided == null)
                 {
                     item.GetComponent<UnitAttributes>().FactionSided = this.gameObject;
@@ -167,32 +173,41 @@ public class Faction : MonoBehaviour
         }
     }
 
-    public void CapturedTilesAdd(TerrainProperty terrain) {
+    public void CapturedTilesAdd(TerrainProperty terrain)
+    {
         if (!TerrainList.Contains(terrain))
         {
-            if (terrain.isCapturable)
+            if (terrain.IsCapturable)
             {
                 TerrainList.Add(terrain);
             }
         }
     }
-    public void CapturedTilesRemove(TerrainProperty terrain) {
+
+    public void CapturedTilesRemove(TerrainProperty terrain)
+    {
         if (TerrainList.Contains(terrain))
         {
             TerrainList.Remove(terrain);
         }
     }
+
     public void UnitAdd(UnitAttributes unit)
     {
-        if (!UnitList.Contains(unit)) {
+        if (!UnitList.Contains(unit))
+        {
             UnitList.Add(unit);
         }
     }
-    public void UnitRemove(UnitAttributes unit) {
-        if (UnitList.Contains(unit)) {
+
+    public void UnitRemove(UnitAttributes unit)
+    {
+        if (UnitList.Contains(unit))
+        {
             UnitList.Remove(unit);
         }
-        if (UnitList.Count == 0) {
+        if (UnitList.Count == 0)
+        {
             LevelManager.DM.EndScenario();
         }
     }
