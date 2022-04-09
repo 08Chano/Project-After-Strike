@@ -5,17 +5,27 @@ using UnityEngine;
 
 public class TerrainProperty : MonoBehaviour
 {
+    public TerrainType TerrainType { get => m_TerrainType; private set => m_TerrainType = value; }
+
     public int DefenceValue { get => m_DefenceValue; private set => m_DefenceValue = value; }
+
     public bool IsCapturable { get => m_IsCapturable; private set => m_IsCapturable = value; }
+
     public bool IsDefendable { get => m_IsDefendable; private set => m_IsDefendable = value; }
+
     public bool IsBase { get => m_IsBase; private set => m_IsBase = value; }
+
     public FactionType Heldby { get => m_Heldby; private set => m_Heldby = value; }
+
     public bool IsOccupied => m_IsOccupied != FactionType.Neutral || m_IsOccupied == Heldby;
+
     public RecoveryType RecoveryStrength { get => m_RecoveryStrength; private set => m_RecoveryStrength = value; }
-    public int CapturePower 
-    { 
+
+    public int CapturePower
+    {
         get => m_CapturePower;
-        set {
+        set
+        {
             m_CapturePower = value;
             CapturePowerUpdated?.Invoke(CapturePower);
         }
@@ -25,10 +35,14 @@ public class TerrainProperty : MonoBehaviour
 
 
     [Header("TIle Effects")]
-    [SerializeField] private SpriteRenderer m_MainSpriteRenderer;
-    [SerializeField] private Material m_AttackTileMat;
-    [SerializeField] private Material m_MoveTileMat;
-    [SerializeField] private Material m_TargetTileMat;
+    [SerializeField]
+    private SpriteRenderer m_MainSpriteRenderer;
+    [SerializeField]
+    private Material m_AttackTileMat;
+    [SerializeField]
+    private Material m_MoveTileMat;
+    [SerializeField]
+    private Material m_TargetTileMat;
 
     /// <summary>
     /// Adjacent tiles that the unit is able to navigate to.
@@ -44,9 +58,7 @@ public class TerrainProperty : MonoBehaviour
 
     public SpriteRenderer MainSpriteRenderer => m_MainSpriteRenderer;
 
-
     private Action<int> m_CapturePowerUpdated;
-
 
     public bool Occuping;
     public bool isHostile;
@@ -55,21 +67,14 @@ public class TerrainProperty : MonoBehaviour
     public bool isValid;
     public bool isAccounted = false;
 
-    [Header("Unit Effects")]
     private int m_DefenceValue = 0;
     private bool m_IsCapturable = false;
     private bool m_IsDefendable = false;
-
-    [Header("Terrain Attributes")]
-    private string m_TileName = string.Empty;
+    private TerrainType m_TerrainType = TerrainType.Void;
     private bool m_IsBase = false;
-    private bool m_IsCaptured = false;
-    private bool m_IsDefended = false;
     private FactionType m_IsOccupied = FactionType.Neutral;
     private FactionType m_Heldby = FactionType.Neutral;
     private RecoveryType m_RecoveryStrength = RecoveryType.None;
-
-    [Range(0, 200)]
     private int m_CapturePower = 0;
 
     [Header("Unit Movement Cost")]
@@ -80,11 +85,11 @@ public class TerrainProperty : MonoBehaviour
         //Sets tile as faction's base, overriding terrain values
         if (isSeabase)
         {
-            TravelCost(1, 1, 1, 1, 1, 1, 1, 1, 1, "Sea HQ");
+            TravelCost(1, 1, 1, 1, 1, 1, 1, 1, 1);
         }
         else
         {
-            TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "HQ");
+            TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);
         }
 
         IsBase = true;
@@ -95,79 +100,81 @@ public class TerrainProperty : MonoBehaviour
 
     public void SetTerrainProperties(TerrainType terrainType)
     {
+        m_TerrainType = terrainType;
+
         switch (terrainType)
         {
             case TerrainType.Plains:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Plains");
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);
                 break;
             case TerrainType.Marsh:
-                TravelCost(2, 1, 2, 1, 999, 999, 999, 1, 1, "Marsh");//Marsh
+                TravelCost(2, 1, 2, 1, 999, 999, 999, 1, 1);//Marsh
                 break;
             case TerrainType.Woods:
-                TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1, "Woods");//Woods
+                TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1);//Woods
                 break;
             case TerrainType.River:
-                TravelCost(2, 1, 1, 1, 2, 999, 999, 1, 1, "River");//River
+                TravelCost(2, 1, 1, 1, 2, 999, 999, 1, 1);//River
                 break;
             case TerrainType.BrokenEarth:
-                TravelCost(2, 2, 999, 1, 999, 999, 999, 1, 1, "Broken Earth");//Broken Earth
+                TravelCost(2, 2, 999, 1, 999, 999, 999, 1, 1);//Broken Earth
                 break;
             case TerrainType.Hills:
-                TravelCost(2, 2, 3, 2, 999, 999, 999, 1, 1, "Mountain H1");//Mountain H1
+                TravelCost(2, 2, 3, 2, 999, 999, 999, 1, 1);//Mountain H1
                 break;
             case TerrainType.Mountain:
-                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999, "Mountain H2");//Mountain H2
+                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999);//Mountain H2
                 break;
             case TerrainType.Crags:
-                TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1, "Crags");//Crags
+                TravelCost(1, 2, 2, 1, 999, 999, 999, 1, 1);//Crags
                 break;
             case TerrainType.Dunes:
-                TravelCost(1, 1, 2, 1, 999, 999, 999, 1, 1, "Dunes");//Dunes
+                TravelCost(1, 1, 2, 1, 999, 999, 999, 1, 1);//Dunes
                 break;
             case TerrainType.City:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "City");//City
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//City
                 IsCapturable = true;
                 break;
             case TerrainType.Town:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Town");//Town
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//Town
                 break;
             case TerrainType.Factory:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Facotry");//Factory
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//Factory
                 break;
             case TerrainType.Airport:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Airport");//Airport
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//Airport
                 break;
             case TerrainType.Harbour:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Dock");//Dock
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//Dock
                 break;
             case TerrainType.Rubble:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Rubble");//Rubble
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//Rubble
                 break;
             case TerrainType.Road:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Road");//Road
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//Road
                 break;
             case TerrainType.Bridge:
-                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1, "Bridge");//Bridge
+                TravelCost(1, 1, 1, 1, 999, 999, 999, 1, 1);//Bridge
                 break;
             case TerrainType.Sea:
-                TravelCost(999, 999, 999, 999, 1, 1, 1, 1, 1, "Sea");//Sea
+                TravelCost(999, 999, 999, 999, 1, 1, 1, 1, 1);//Sea
                 break;
             case TerrainType.RoughSea:
-                TravelCost(999, 999, 999, 999, 2, 1, 1, 1, 1, "Rough Sea");//Rough Sea
+                TravelCost(999, 999, 999, 999, 2, 1, 1, 1, 1);//Rough Sea
                 break;
             case TerrainType.Fog:
-                TravelCost(999, 999, 999, 999, 1, 1, 1, 1, 1, "Fog");//Fog
+                TravelCost(999, 999, 999, 999, 1, 1, 1, 1, 1);//Fog
                 break;
             case TerrainType.Reef:
-                TravelCost(999, 999, 999, 999, 2, 3, 3, 1, 1, "Reef");//Reef
+                TravelCost(999, 999, 999, 999, 2, 3, 3, 1, 1);//Reef
                 break;
             default:
-                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999, "Void");
+                TravelCost(999, 999, 999, 999, 999, 999, 999, 999, 999);
                 break;
         }
     }
 
-    private void TravelCost(int foot, int specialist, int tiresA, int tiresB, int tank, int shipA, int shipB, int air, int sub, string NewName)
+    private void TravelCost(int foot, int specialist, int tiresA, int tiresB, int tank, int shipA, int shipB, int air, int sub)
     {
         m_MovementCostDict.Clear();
 
@@ -184,8 +191,6 @@ public class TerrainProperty : MonoBehaviour
         m_MovementCostDict.Add(MovementType.Submarine, sub);
 
         m_MovementCostDict.Add(MovementType.Air, air);
-
-        m_TileName = NewName;
     }
 
     public int TCost(MovementType unitType)
@@ -193,7 +198,7 @@ public class TerrainProperty : MonoBehaviour
         return m_MovementCostDict[unitType];
     }
 
-    public void CaptureCall(Faction faction)
+    public void CaptureCall(FactionClass faction)
     {
         CapturePower = 0;
         gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = faction.inGameID_Col;

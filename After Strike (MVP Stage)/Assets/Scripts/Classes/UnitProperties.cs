@@ -19,7 +19,7 @@ public class UnitProperties : MonoBehaviour
 
     public GameObject[] Coordinates;
 
-    TerrainProperty SitCoordinate;
+    TerrainProperty OccupiedTerrain;
 
     Vector3 velocity = new Vector3();
     Vector3 TransitionNode = new Vector3();
@@ -47,8 +47,8 @@ public class UnitProperties : MonoBehaviour
     }
     public void GetCoordinate()
     {
-        SitCoordinate = Destination(gameObject);
-        SitCoordinate.isOccupied = true;
+        OccupiedTerrain = Destination(gameObject);
+        OccupiedTerrain.isOccupied = true;
     }
     public TerrainProperty Destination(GameObject Destination)
     {
@@ -69,14 +69,15 @@ public class UnitProperties : MonoBehaviour
             item.GetComponent<TerrainProperty>().ViableMovementGrid(gameObject);
         }
     }
-    public void Cast_Movement() {
+    public void Cast_Movement()
+    {
         FindMoveConnect();
         GetCoordinate();
 
         Queue<TerrainProperty> queue = new Queue<TerrainProperty>();
 
-        queue.Enqueue(SitCoordinate);
-        SitCoordinate.isAccounted = true;
+        queue.Enqueue(OccupiedTerrain);
+        OccupiedTerrain.isAccounted = true;
 
         while (queue.Count > 0)
         {
@@ -130,26 +131,31 @@ public class UnitProperties : MonoBehaviour
             }
         }
     }
-    public void Cast_AttackTiles() {
-        if (gameObject.GetComponent<UnitAttributes>().LoS) {
+    public void Cast_AttackTiles()
+    {
+        if (gameObject.GetComponent<UnitAttributes>().LoS)
+        {
             foreach (GameObject item in Coordinates) { item.GetComponent<TerrainProperty>().Reset(); }
 
             GetCoordinate();
-            SitCoordinate.LoSAttackGrid(gameObject, Vector3.forward, gameObject.GetComponent<UnitAttributes>().Range + 1);
-            SitCoordinate.LoSAttackGrid(gameObject, Vector3.right, gameObject.GetComponent<UnitAttributes>().Range + 1);
-            SitCoordinate.LoSAttackGrid(gameObject, Vector3.back, gameObject.GetComponent<UnitAttributes>().Range + 1);
-            SitCoordinate.LoSAttackGrid(gameObject, Vector3.left, gameObject.GetComponent<UnitAttributes>().Range+1);
+            OccupiedTerrain.LoSAttackGrid(gameObject, Vector3.forward, gameObject.GetComponent<UnitAttributes>().Range + 1);
+            OccupiedTerrain.LoSAttackGrid(gameObject, Vector3.right, gameObject.GetComponent<UnitAttributes>().Range + 1);
+            OccupiedTerrain.LoSAttackGrid(gameObject, Vector3.back, gameObject.GetComponent<UnitAttributes>().Range + 1);
+            OccupiedTerrain.LoSAttackGrid(gameObject, Vector3.left, gameObject.GetComponent<UnitAttributes>().Range + 1);
 
-        } else {
+        }
+        else
+        {
             foreach (GameObject item in Coordinates) { item.GetComponent<TerrainProperty>().ViableTargetGrid(gameObject); }
 
             GetCoordinate();//Pulls current position
             Queue<TerrainProperty> queue = new Queue<TerrainProperty>();//Assigns a queue order to create an area check
 
-            queue.Enqueue(SitCoordinate);//Assigns the current position
-            SitCoordinate.isAccounted = true;//to be ignored during grid check as it's already assigned
+            queue.Enqueue(OccupiedTerrain);//Assigns the current position
+            OccupiedTerrain.isAccounted = true;//to be ignored during grid check as it's already assigned
 
-            while (queue.Count > 0) {
+            while (queue.Count > 0)
+            {
                 TerrainProperty terrain = queue.Dequeue();//Assigns it already
                 ValidSpace.Add(terrain);
                 terrain.isValid = true;
@@ -158,12 +164,15 @@ public class UnitProperties : MonoBehaviour
                 {
                     //Pulls each connected tile into a loop that will then assign them within the queue
                     //This creates a loop that will run until the all connected tiles are no longer in range
-                    foreach (TerrainProperty item in terrain.AttackRangeList) {
-                        if (!item.isAccounted) {
+                    foreach (TerrainProperty item in terrain.AttackRangeList)
+                    {
+                        if (!item.isAccounted)
+                        {
                             item.parent = terrain;
                             item.isAccounted = true;
                             item.Range = terrain.Range + 1;
-                            if (item.Range <= gameObject.GetComponent<UnitAttributes>().Range) {
+                            if (item.Range <= gameObject.GetComponent<UnitAttributes>().Range)
+                            {
                                 queue.Enqueue(item);
                             }
                         }
@@ -172,14 +181,18 @@ public class UnitProperties : MonoBehaviour
             }
         }
     }
-    public bool ValidAttack(GameObject target) {
+    public bool ValidAttack(GameObject target)
+    {
         bool isValid = false;
 
         RaycastHit hit;
-        if (Physics.Raycast(this.transform.position, Vector3.down * 10, out hit, 10)) {
-            if (hit.collider.GetComponent<TerrainProperty>() != null) {
+        if (Physics.Raycast(this.transform.position, Vector3.down * 10, out hit, 10))
+        {
+            if (hit.collider.GetComponent<TerrainProperty>() != null)
+            {
                 TerrainProperty terrain = hit.collider.GetComponent<TerrainProperty>();
-                if (terrain.isHostile) {
+                if (terrain.isHostile)
+                {
                     isValid = true;
                     return isValid;
                 }
@@ -188,7 +201,8 @@ public class UnitProperties : MonoBehaviour
         print("THis is " + isValid + " target");
         return isValid;
     }
-    public void AttackPhase(GameObject target) {
+    public void AttackPhase(GameObject target)
+    {
 
         //Range Check Code
 
@@ -203,20 +217,26 @@ public class UnitProperties : MonoBehaviour
 
         UnitAttributes TarUnitAttributes = target.GetComponent<UnitAttributes>();
         float DefendingUnitDef = TarUnitAttributes.EffectiveDefenceReturn();
-        if (TarUnitAttributes.isDefending) {
+
+        if (TarUnitAttributes.isDefending)
+        {
             //Calculate Starting Attack (before it takes damage)
             float DefendingUnitAtt = TarUnitAttributes.EffectiveAttackReturn();
             TarUnitAttributes.HealthPool -= TarUnitAttributes.DamageReturn(OffensiveUnitAtt, DefendingUnitDef, OffUnitAttributes);
             OffUnitAttributes.HealthPool -= OffUnitAttributes.DamageReturn(DefendingUnitAtt, OffensiveUnitDef, TarUnitAttributes);
         }
-        else {
+        else
+        {
             //Phase 1
             TarUnitAttributes.HealthPool -= TarUnitAttributes.DamageReturn(OffensiveUnitAtt, DefendingUnitDef, OffUnitAttributes);
             //Phase 2
-            if (TarUnitAttributes.HealthPool > 0) {
+            if (TarUnitAttributes.HealthPool > 0)
+            {
                 float DefendingUnitAtt = TarUnitAttributes.EffectiveAttackReturn();
                 OffUnitAttributes.HealthPool -= OffUnitAttributes.DamageReturn(DefendingUnitAtt, OffensiveUnitDef, TarUnitAttributes);
-            } else {
+            }
+            else
+            {
                 Destroy(TarUnitAttributes.gameObject);
             }
         }
@@ -225,9 +245,11 @@ public class UnitProperties : MonoBehaviour
         EndPhase();
     }
 
-    private void SkipMove() {
+    private void SkipMove()
+    {
         //Local Variables
-        if (SkipperVar != null) {
+        if (SkipperVar != null)
+        {
             transform.position = SkipperVar.transform.position;
             transform.position += Vector3.up;
         }
@@ -242,7 +264,8 @@ public class UnitProperties : MonoBehaviour
             Vector3 Goal = terrain.transform.position;
             Goal += Vector3.up;
 
-            if (Vector3.Distance(transform.position, Goal) > 0.3f) {
+            if (Vector3.Distance(transform.position, Goal) > 0.3f)
+            {
 
                 Transition(Goal);
                 AxisTransition();
@@ -282,11 +305,15 @@ public class UnitProperties : MonoBehaviour
                 //        break;
                 //}
 
-            } else {
+            }
+            else
+            {
                 transform.position = Goal;
                 CP.Pop();
             }
-        } else {
+        }
+        else
+        {
 
             Reset();
             transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.green;
@@ -295,7 +322,8 @@ public class UnitProperties : MonoBehaviour
         }
     }
 
-    private void Reset() {
+    private void Reset()
+    {
         //Local Variable Reset
         Debug.Log(gameObject.name);
         SkipperVar = null;
@@ -322,7 +350,8 @@ public class UnitProperties : MonoBehaviour
     /// <summary>
     /// End of Movement Code
     /// </summary>
-    public void Action_Attack() {
+    public void Action_Attack()
+    {
         //Needs to cast an area
         AttackChecking = true;
         //Play Animations and change UI (TBWO)
@@ -348,7 +377,7 @@ public class UnitProperties : MonoBehaviour
                         terrain.CapturePower += this.GetComponent<UnitAttributes>().HealthPool;
                         if (terrain.CapturePower >= 200)
                         {
-                            terrain.CaptureCall(gameObject.GetComponent<UnitAttributes>().FactionSided.GetComponent<Faction>());
+                            terrain.CaptureCall(gameObject.GetComponent<UnitAttributes>().FactionSided.GetComponent<FactionClass>());
                         }
                     }
                 }
@@ -361,7 +390,8 @@ public class UnitProperties : MonoBehaviour
         gameObject.GetComponent<UnitAttributes>().isWaiting = true;
         EndPhase();
     }
-    public void Action_Recover(RecoveryType RecID, int MaxFuelPool) {
+    public void Action_Recover(RecoveryType RecID, int MaxFuelPool)
+    {
         switch (RecID)
         {
             case RecoveryType.Weak:
@@ -426,9 +456,10 @@ public class UnitProperties : MonoBehaviour
         GameManager.GManager.QuickCancel();
 
         this.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.grey;
-        this.GetComponent<UnitAttributes>().FactionSided.GetComponent<Faction>().EndTurn_Faction();
+        this.GetComponent<UnitAttributes>().FactionSided.GetComponent<FactionClass>().EndTurn_Faction();
     }
-    public void WipeSelect() {
+    public void WipeSelect()
+    {
         isSelected = false;
         MoveChecking = false;
         AttackChecking = false;

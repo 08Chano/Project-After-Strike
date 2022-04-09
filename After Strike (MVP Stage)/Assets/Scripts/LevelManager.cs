@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LevelManager : MonoBehaviour {
-
-    public static Queue<Faction> FactionQueue = new Queue<Faction>();
+public class LevelManager : MonoBehaviour
+{
+    public static Queue<FactionClass> FactionQueue = new Queue<FactionClass>();
     public static LevelManager DM;
 
     private void OnEnable()
@@ -46,30 +46,39 @@ public class LevelManager : MonoBehaviour {
     /// <summary>
     /// Controller for the game's main system
     /// </summary>
-    public void StartGame(Scene scene, LoadSceneMode loadScene) {
+    public void StartGame(Scene scene, LoadSceneMode loadScene)
+    {
         //Test
         //print("Something's supposed to happen in here: " + scene.name);
 
         //Command line
         int bounds = 0;
-        if (GameManager.GManager != null) {
+        if (GameManager.GManager != null)
+        {
             bounds = GameManager.GManager.MapDimensions;
         }
-        if (bounds < 10) {
+        if (bounds < 10)
+        {
             bounds = 10;
         }
 
         //Actual Function
-        if (scene.name.Contains("Main")) {
-//            print("This looks right");
+        if (scene.name.Contains("Main"))
+        {
+            //            print("This looks right");
             Map = new TerrainProperty[bounds, bounds];
 
-            for (int i = 0; i < bounds; i++) {
-                for (int j = 0; j < bounds; j++) {
+            for (int i = 0; i < bounds; i++)
+            {
+                for (int j = 0; j < bounds; j++)
+                {
                     Map[i, j] = Instantiate(m_BaseTerrain, new Vector3(i, 0, j), Quaternion.identity, gameObject.transform);
-                    if (i == 0 || j == 0 || i == bounds -1 || j == bounds - 1) {
+                    if (i == 0 || j == 0 || i == bounds - 1 || j == bounds - 1)
+                    {
                         Map[i, j].SetTerrainProperties(TerrainType.Sea);
-                    } else {
+                    }
+                    else
+                    {
                         Map[i, j].SetTerrainProperties(TerrainType.Plains);
                     }
                 }
@@ -127,20 +136,24 @@ public class LevelManager : MonoBehaviour {
             }
 
             //Spawns the main faction gameobject that acts a controller
-            for (int i = 0; i < GameManager.GManager.TeamCount; i++) {
+            for (int i = 0; i < GameManager.GManager.TeamCount; i++)
+            {
                 GameObject newfaction = Instantiate(Resources.Load("FactionContainer", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
-                Faction nfaction = newfaction.GetComponent<Faction>();
+                FactionClass nfaction = newfaction.GetComponent<FactionClass>();
                 nfaction.tag = "Faction" + (i + 1);
                 nfaction.inGameID_ID = nfaction.tag;
-                if (i == 0) {
+                if (i == 0)
+                {
                     nfaction.FactionGenerator((FactionType)Random.Range(1, 7), GameManager.GManager.TeamColour);
-                } else {
+                }
+                else
+                {
                     nfaction.FactionGenerator((FactionType)Random.Range(1, 7), Color.white);
                 }
-                FactionQueue.Enqueue(newfaction.GetComponent<Faction>());
+                FactionQueue.Enqueue(newfaction.GetComponent<FactionClass>());
             }
 
-//            print("there are " + FactionQueue + "in the queue and " + FactionQueue.Peek().Faction_Name + "is first");
+            //            print("there are " + FactionQueue + "in the queue and " + FactionQueue.Peek().Faction_Name + "is first");
 
             //Reset's Camera Position
             GameManager.GManager.transform.position = new Vector3(0, 10, 0);
@@ -151,47 +164,58 @@ public class LevelManager : MonoBehaviour {
             BeginTurn();
         }
     }
-    
-    public string ActiveFactionReturn() {
+
+    public string ActiveFactionReturn()
+    {
         string CurrentFaction = "";
         CurrentFaction = FactionQueue.Peek().tag;
         return CurrentFaction;
     }
 
-    private void QuickCycle() {
-        for (int i = 0; i < FactionQueue.Count; i++) {
-            if (FactionQueue.Peek().TerrainList.Count == 0) {
-                if (FactionQueue.Peek().UnitList.Count == 0) {
+    private void QuickCycle()
+    {
+        for (int i = 0; i < FactionQueue.Count; i++)
+        {
+            if (FactionQueue.Peek().TerrainList.Count == 0)
+            {
+                if (FactionQueue.Peek().UnitList.Count == 0)
+                {
                     FactionQueue.Peek().FindThings();
                 }
             }
-            Faction faction = FactionQueue.Dequeue();
+            FactionClass faction = FactionQueue.Dequeue();
             FactionQueue.Enqueue(faction);
         }
     }
 
-    public void BeginTurn() {
-        if (FactionQueue.Peek().TerrainList.Count == 0) {
-            if (FactionQueue.Peek().UnitList.Count == 0) {
+    public void BeginTurn()
+    {
+        if (FactionQueue.Peek().TerrainList.Count == 0)
+        {
+            if (FactionQueue.Peek().UnitList.Count == 0)
+            {
                 FactionQueue.Peek().FindThings();
             }
         }
         FactionQueue.Peek().StartTurn_Faction();
     }
 
-    public void EndTurn() {
+    public void EndTurn()
+    {
         print("Ending Turn!");
         GameManager.GManager.QuickCancel();
-        Faction faction = FactionQueue.Dequeue();
+        FactionClass faction = FactionQueue.Dequeue();
         FactionQueue.Enqueue(faction);
         LevelManager.DM.turntimer++;
-        if (LevelManager.DM.turntimer++ > GameManager.GManager.TeamCount) {
+        if (LevelManager.DM.turntimer++ > GameManager.GManager.TeamCount)
+        {
             GameScreenManager.Profiler.PhaseValue++;
             LevelManager.DM.turntimer = 0;
         }
         BeginTurn();
     }
-    public void EndScenario() {
+    public void EndScenario()
+    {
         print("Someone has Lost!");
     }
 }

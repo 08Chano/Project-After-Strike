@@ -4,9 +4,8 @@ using AfterStrike.Manager;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Faction : MonoBehaviour
+public class FactionClass : MonoBehaviour
 {
-
     //GameSystems
     public string inGameID_ID;
     public Color inGameID_Col;
@@ -15,7 +14,8 @@ public class Faction : MonoBehaviour
     public bool isFriendly;
     public Sprite sprite_Commander;
     public Sprite sprite_Faction;
-    public FactionType m_FactionType;
+    private FactionType factionType;
+
     //In game Content
     public string Faction_Name;
 
@@ -23,6 +23,8 @@ public class Faction : MonoBehaviour
 
     public List<TerrainProperty> TerrainList = new List<TerrainProperty>();
     public List<UnitAttributes> UnitList = new List<UnitAttributes>();
+
+    public FactionType FactionType { get => factionType; set => factionType = value; }
 
     public void FactionGenerator(FactionType FactionID, Color FactionColor)
     {
@@ -103,7 +105,7 @@ public class Faction : MonoBehaviour
 
     public void StartTurn_Faction()
     {
-        GameScreenManager.UpdateProfiles(this.GetComponent<Faction>());
+        GameScreenManager.UpdateProfiles(this.GetComponent<FactionClass>());
         Funds += TerrainList.Count * GameManager.GManager.Mod_Funds_Generated;
 
         print(Faction_Name + " is Starting their turn. Their funds are at: " + Funds + "and have " + TerrainList.Count + " tiles under their control, producing: " + GameManager.GManager.Mod_Funds_Generated);
@@ -122,7 +124,7 @@ public class Faction : MonoBehaviour
                         {
                             TerrainProperty terrain = hit.collider.GetComponent<TerrainProperty>();
 
-                            if (terrain.Heldby == m_FactionType)
+                            if (terrain.Heldby == FactionType)
                             {
                                 item.GetComponent<UnitActions>().Action_Recover(terrain.RecoveryStrength, item.MaxFuelPool);
                             }
@@ -158,6 +160,7 @@ public class Faction : MonoBehaviour
     {
         GameObject[] findableUnits;
         findableUnits = GameObject.FindGameObjectsWithTag(this.tag);
+
         foreach (GameObject item in findableUnits)
         {
             if (item.GetComponent<UnitAttributes>() != null)

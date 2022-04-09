@@ -185,7 +185,7 @@ namespace AfterStrike.Class.Unit
         {
             //Wipe any further attachments from this, such as tile icons added for player vision and markers that are attached to it
             Reset();
-            FactionSided.GetComponent<Faction>().UnitRemove(this);
+            FactionSided.GetComponent<FactionClass>().UnitRemove(this);
             //To Be Added
             //-Unit markers
             //-Death animation

@@ -251,7 +251,7 @@ namespace AfterStrike.Manager
         }
 
 
-        public static void UpdateProfiles(Faction faction)
+        public static void UpdateProfiles(FactionClass faction)
         {
             if (GameScreenManager.Profiler != null)
             {

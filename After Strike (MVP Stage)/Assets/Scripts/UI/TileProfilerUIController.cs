@@ -53,7 +53,7 @@ namespace AfterStrike.UI
                         {
                             //Change the silder's fore-colour to capturing Unit's Faction Colour
                             DisplayCaptureBar(true, terrain.CapturePower,
-                                UnitDetection.collider.GetComponent<UnitAttributes>().FactionSided.GetComponent<Faction>().inGameID_Col);
+                                UnitDetection.collider.GetComponent<UnitAttributes>().FactionSided.GetComponent<FactionClass>().inGameID_Col);
                         }
                     }
                 }
@@ -120,11 +120,6 @@ namespace AfterStrike.UI
             m_MovementMeter.CurrentValue = previewUnit.Movement;
             m_AttackMeter.CurrentValue = previewUnit.Attack;
             m_DefenceMeter.CurrentValue = previewUnit.Defence;
-        }
-
-        private void Awake()
-        {
-            
         }
     }
 }

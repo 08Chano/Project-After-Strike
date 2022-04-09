@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GameSystems : GameSystemsLibrary
 {
-    protected List<Faction> ActiveTeams;
+    protected List<FactionClass> ActiveTeams;
 
     public void SceneChange()
     {
@@ -38,9 +38,9 @@ public class GameSystems : GameSystemsLibrary
         //Spawn the correct factions
         for (int i = 0; i < TeamCount; i++)
         {
-            ActiveTeams.Add(Instantiate(Resources.Load("FactionContainer", typeof(GameObject)), new Vector3(0, 0, 0), Quaternion.identity) as Faction);
+            ActiveTeams.Add(Instantiate(Resources.Load("FactionContainer", typeof(GameObject)), new Vector3(0, 0, 0), Quaternion.identity) as FactionClass);
         }
-        foreach (Faction item in ActiveTeams)
+        foreach (FactionClass item in ActiveTeams)
         {
 
         }

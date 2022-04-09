@@ -27,7 +27,7 @@ public class GameManager : GameSystems
 
     public GameObject HeldObject;
 
-    private float RefreshRate = 0.03f;
+    private const float RefreshRate = 0.03f;
 
     private void Awake()
     {
@@ -50,7 +50,8 @@ public class GameManager : GameSystems
             BattleScreen();
         }
     }
-    void BattleScreen() {
+    void BattleScreen()
+    {
         if (Input.GetButtonDown("Escape")) { Toggle(); }
         if (Input.GetButtonDown("Switch")) { StatToggle(); }
 
@@ -58,8 +59,10 @@ public class GameManager : GameSystems
         if (Input.GetButton("Horizontal")) { gameObject.transform.Translate(new Vector2(Input.GetAxis("Horizontal"), 0)); }
         if (Input.GetButton("Vertical")) { gameObject.transform.Translate(new Vector2(0, Input.GetAxis("Vertical"))); }
 
-        if (Input.GetButtonDown("Select")) {
-            if (FreezeClicks) {
+        if (Input.GetButtonDown("Select"))
+        {
+            if (FreezeClicks)
+            {
                 //Skips Playing Animation for Battles and Moving
                 skipToggle();
                 skipToggle();
@@ -67,53 +70,79 @@ public class GameManager : GameSystems
             }
 
             RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector3.down * 10, out hit, 10)) {
-                if (hit.collider != null) {
-                    if (EventSystem.current.IsPointerOverGameObject()) {
-                    } else if (hit.collider.GetComponent<UnitActions>() != null) {
-                        if (!hit.collider.GetComponent<UnitActions>().ActionAvailable && hit.collider.tag == LevelManager.DM.ActiveFactionReturn()) {
+            if (Physics.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector3.down * 10, out hit, 10))
+            {
+                if (hit.collider != null)
+                {
+                    if (EventSystem.current.IsPointerOverGameObject())
+                    {
+                    }
+                    else if (hit.collider.GetComponent<UnitActions>() != null)
+                    {
+                        if (!hit.collider.GetComponent<UnitActions>().ActionAvailable && hit.collider.tag == LevelManager.DM.ActiveFactionReturn())
+                        {
                             return; //Stops check if the unit is able to be interacted with
                         }
-                        if (hit.collider.gameObject != HeldObject) {
+                        if (hit.collider.gameObject != HeldObject)
+                        {
                             //Checks if the Unit is is checking for viable targets
-                            if (HeldObject != null) {
+                            if (HeldObject != null)
+                            {
                                 print("Unit is searching target = " + HeldObject.GetComponent<UnitActions>().AttackChecking);
                             }
-                            if (HeldObject!= null && HeldObject.GetComponent<UnitActions>().AttackChecking) {
+                            if (HeldObject != null && HeldObject.GetComponent<UnitActions>().AttackChecking)
+                            {
                                 print("Unit is checking for Valid Targets");
                                 UnitActions unitActions = HeldObject.GetComponent<UnitActions>();
-                                if (hit.collider.tag == HeldObject.tag) {
+                                if (hit.collider.tag == HeldObject.tag)
+                                {
                                     return;//Ends function check
-                                } else if (hit.collider.tag != HeldObject.tag) {
+                                }
+                                else if (hit.collider.tag != HeldObject.tag)
+                                {
                                     //Checks if selected unit is within the target space
-                                    if (unitActions.ValidAttack(hit.collider.gameObject)) {
+                                    if (unitActions.ValidAttack(hit.collider.gameObject))
+                                    {
                                         HeldObject.GetComponent<UnitActions>().AttackPhase(hit.collider.gameObject);
                                         Cancel();
                                         return;
                                     }
                                 }
-                            } else {
-                                if (HeldObject != null) {
+                            }
+                            else
+                            {
+                                if (HeldObject != null)
+                                {
                                     GameManager.GManager.HeldObject.GetComponent<UnitActions>().WipeSelect();
                                 }
-                                if (!GameScreenManager.ActionsActive) {
+                                if (!GameScreenManager.ActionsActive)
+                                {
                                     ActToggle();
                                 }
                                 HeldObject = hit.collider.gameObject;
                                 HeldObject.GetComponent<UnitActions>().isSelected = true;
                                 return;
                             }
-                        } else if (hit.collider.gameObject == HeldObject) {
-                            if (HeldObject.GetComponent<UnitActions>().ActionsMove) {
+                        }
+                        else if (hit.collider.gameObject == HeldObject)
+                        {
+                            if (HeldObject.GetComponent<UnitActions>().ActionsMove)
+                            {
                                 CallAction_Move();
-                            } else if (HeldObject.GetComponent<UnitActions>().ActionAvailable) {
+                            }
+                            else if (HeldObject.GetComponent<UnitActions>().ActionAvailable)
+                            {
                                 CallAction_Attack();
                             }
                         }
-                    } else if (hit.collider.GetComponent<TerrainProperty>() != null) {
+                    }
+                    else if (hit.collider.GetComponent<TerrainProperty>() != null)
+                    {
                         TerrainProperty terrain = hit.collider.GetComponent<TerrainProperty>();
-                        if (terrain.isValid && !terrain.isHostile) {
-                            if (HeldObject != null) {
+                        if (terrain.isValid && !terrain.isHostile)
+                        {
+                            if (HeldObject != null)
+                            {
                                 //Move Agent
                                 terrain.isTarget = true;
 
@@ -123,13 +152,19 @@ public class GameManager : GameSystems
                                 //Cancel();
                                 //HeldObject = null;
                             }
-                        } else if (terrain.isValid && terrain.isHostile) {
+                        }
+                        else if (terrain.isValid && terrain.isHostile)
+                        {
                             HeldObject.GetComponent<UnitActions>().AttackPhase(hit.collider.gameObject);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         Debug.Log("Unit Not Found");
                     }
-                } else {
+                }
+                else
+                {
                     Debug.Log("Nothing Found");
                 }
             }
@@ -159,7 +194,7 @@ public class GameManager : GameSystems
                 GameManager.GManager.HeldObject.GetComponent<UnitActions>().WipeSelect();
             }
         }
- 
+
         if (GameScreenManager.ActionsActive) { ActToggle(); }
 
         GameManager.GManager.HeldObject = null;
@@ -172,6 +207,7 @@ public class GameManager : GameSystems
         CancelToggle();
         CancelToggle();
     }
+
     public void CallAction_Move()
     {
         if (HeldObject != null)
@@ -188,6 +224,7 @@ public class GameManager : GameSystems
             }
         }
     }
+
     public void CallAction_Attack()
     {
         if (HeldObject != null)
