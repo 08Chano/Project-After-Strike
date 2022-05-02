@@ -1,4 +1,5 @@
-﻿using AfterStrike.Enum;
+﻿using AfterStrike.Class.Unit;
+using AfterStrike.Enum;
 using AfterStrike.Manager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,7 +40,16 @@ public class LevelManager : MonoBehaviour
 
     [SerializeField]
     private TerrainProperty m_BaseTerrain;
-    private GameObject[] Team;
+
+    [SerializeField]
+    private List<Sprite> m_TerrainSpriteLib;
+
+    [SerializeField]
+    private UnitAttributes m_UnitPrefab;
+
+    [SerializeField]
+    private FactionClass m_FactionPrefab;
+
     public TerrainProperty[,] Map;
     private int turntimer;
 
@@ -73,6 +83,7 @@ public class LevelManager : MonoBehaviour
                 for (int j = 0; j < bounds; j++)
                 {
                     Map[i, j] = Instantiate(m_BaseTerrain, new Vector3(i, 0, j), Quaternion.identity, gameObject.transform);
+
                     if (i == 0 || j == 0 || i == bounds - 1 || j == bounds - 1)
                     {
                         Map[i, j].SetTerrainProperties(TerrainType.Sea);
@@ -86,60 +97,34 @@ public class LevelManager : MonoBehaviour
 
             //Test
             int spacer = 1;
-            GameObject temp;
+            UnitAttributes temp;
 
-            switch (GameManager.GManager.TeamCount)
+            Map[spacer, spacer].SetTerrainProperties(TerrainType.City);
+            temp = Instantiate(m_UnitPrefab, new Vector3(spacer, 1, spacer), Quaternion.identity);
+            temp.tag = "Faction1";
+
+            Map[spacer, bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
+            temp = Instantiate(m_UnitPrefab, new Vector3(spacer, 1, bounds - (spacer + 1)), Quaternion.identity);
+            temp.tag = "Faction2";
+
+            if (GameManager.GManager.TeamCount >= 3)
             {
-                case 2:
-                    Map[spacer, spacer].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, spacer), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction1";
+                Map[bounds - (spacer + 1), spacer].SetTerrainProperties(TerrainType.City);
+                temp = Instantiate(m_UnitPrefab, new Vector3(bounds - (spacer + 1), 1, spacer), Quaternion.identity);
+                temp.tag = "Faction3";
+            }
 
-                    Map[bounds - (spacer + 1), bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction2";
-                    break;
-
-                case 3:
-                    Map[spacer, spacer].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, spacer), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction1";
-
-                    Map[spacer, bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction2";
-
-                    Map[bounds - (spacer + 1), spacer].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, spacer), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction3";
-                    break;
-
-                case 4:
-                    Map[spacer, spacer].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, spacer), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction1";
-
-                    Map[spacer, bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(spacer, 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction2";
-
-                    Map[bounds - (spacer + 1), spacer].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, spacer), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction3";
-
-                    Map[bounds - (spacer + 1), bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
-                    temp = Instantiate(Resources.Load("Infantry", typeof(GameObject)), new Vector3(bounds - (spacer + 1), 1, bounds - (spacer + 1)), Quaternion.identity) as GameObject;
-                    temp.tag = "Faction4";
-                    break;
-                default:
-                    break;
+            if (GameManager.GManager.TeamCount >= 4)
+            {
+                Map[bounds - (spacer + 1), bounds - (spacer + 1)].SetTerrainProperties(TerrainType.City);
+                temp = Instantiate(m_UnitPrefab, new Vector3(bounds - (spacer + 1), 1, bounds - (spacer + 1)), Quaternion.identity);
+                temp.tag = "Faction4";
             }
 
             //Spawns the main faction gameobject that acts a controller
             for (int i = 0; i < GameManager.GManager.TeamCount; i++)
             {
-                GameObject newfaction = Instantiate(Resources.Load("FactionContainer", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
-                FactionClass nfaction = newfaction.GetComponent<FactionClass>();
+                FactionClass nfaction = Instantiate(m_FactionPrefab, transform);
                 nfaction.tag = "Faction" + (i + 1);
                 nfaction.inGameID_ID = nfaction.tag;
                 if (i == 0)
@@ -150,7 +135,8 @@ public class LevelManager : MonoBehaviour
                 {
                     nfaction.FactionGenerator((FactionType)Random.Range(1, 7), Color.white);
                 }
-                FactionQueue.Enqueue(newfaction.GetComponent<FactionClass>());
+
+                FactionQueue.Enqueue(nfaction);
             }
 
             //            print("there are " + FactionQueue + "in the queue and " + FactionQueue.Peek().Faction_Name + "is first");
@@ -206,12 +192,14 @@ public class LevelManager : MonoBehaviour
         GameManager.GManager.QuickCancel();
         FactionClass faction = FactionQueue.Dequeue();
         FactionQueue.Enqueue(faction);
-        LevelManager.DM.turntimer++;
-        if (LevelManager.DM.turntimer++ > GameManager.GManager.TeamCount)
+        DM.turntimer++;
+
+        if (DM.turntimer++ > GameManager.GManager.TeamCount)
         {
             GameScreenManager.Profiler.PhaseValue++;
-            LevelManager.DM.turntimer = 0;
+            DM.turntimer = 0;
         }
+
         BeginTurn();
     }
     public void EndScenario()

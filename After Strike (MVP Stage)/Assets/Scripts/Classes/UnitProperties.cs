@@ -25,6 +25,7 @@ public class UnitProperties : MonoBehaviour
     Vector3 TransitionNode = new Vector3();
 
     float VerticalAdjuster = 0;
+
     /// <summary>
     /// Global Events Manager
     /// </summary>
@@ -32,10 +33,12 @@ public class UnitProperties : MonoBehaviour
     {
         GameManager.skipToggle += SkipMove;
     }
+
     void OnDisable()
     {
         GameManager.skipToggle -= SkipMove;
     }
+
     /// <summary>
     /// Generates an array of all of the available tiles that the unit can move to.
     /// </summary>

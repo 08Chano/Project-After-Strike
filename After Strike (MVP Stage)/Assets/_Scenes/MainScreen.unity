@@ -2351,6 +2351,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a692fd2ea1f7914ca62f230b634b21f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_BaseTerrain: {fileID: 114871374872806830, guid: 33c1aac0c11618b4599e255b8a23b781,
+    type: 3}
+  m_TerrainSpriteLib: []
+  m_UnitPrefab: {fileID: 114533440266203320, guid: 0416ba7384f9f6346b25672dfeb81807,
+    type: 3}
+  m_FactionPrefab: {fileID: 114438719310201058, guid: 1c9cc3106a933cd4c861754bd18a0083,
+    type: 3}
 --- !u!4 &1521962687
 Transform:
   m_ObjectHideFlags: 0

@@ -15,10 +15,14 @@ namespace AfterStrike.UI
         /// Displays/Outputs the current percentage.
         /// TODO: Animate the bar filling from "Zero to Current" value.
         /// </summary>
-        public int CurrentValue { get => (int)m_Slider.value; set { 
+        public int CurrentValue
+        {
+            get => (int)m_Slider.value; set
+            {
                 m_Slider.value = value;
                 Sync();
-            } }
+            }
+        }
 
         public bool ShowPreciseValue { get => m_ShowPreciseValue; set => m_ShowPreciseValue = value; }
         public bool ShowAsPercentage { get => m_ShowAsPercentage; set => m_ShowAsPercentage = value; }
@@ -84,7 +88,7 @@ namespace AfterStrike.UI
             if (ShowPreciseValue && !ShowAsPercentage)
                 m_CurrentValueObject.text = m_Slider.value.ToString();
             else if (ShowPreciseValue && ShowAsPercentage)
-                m_CurrentValueObject.text = $"{Mathf.RoundToInt((m_Slider.value/ m_Slider.maxValue) * 100)}%";
+                m_CurrentValueObject.text = $"{Mathf.RoundToInt((m_Slider.value / m_Slider.maxValue) * 100)}%";
         }
     }
 }
